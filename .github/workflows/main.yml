@@ -8,25 +8,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Setup Java JDK
-        uses: actions/setup-java@v3.3.0
+        uses: actions/setup-java@v4
         with:
           java-version: "17"
-          distribution: "adopt"
+          distribution: "temurin"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Setup Android SDK & NDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install NDK and Build-Tools
+        run: |
+          sdkmanager "ndk;25.2.9519653" "build-tools;34.0.0"
+          echo "$ANDROID_HOME/ndk/25.2.9519653" >> $GITHUB_PATH
+          echo "$ANDROID_HOME/build-tools/34.0.0" >> $GITHUB_PATH
 
       - name: Build Perseus APK
-        run: ./patch_perseus.sh
+        run: python3 perseus.py
 
-      - name: Zipalign and Sign Android release
-        run: ./zipalign_sign.sh
-                    
-      - uses: marvinpinto/action-automatic-releases@latest
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
-          draft: true
-          title: "Perseus Release v${{ env.PERSEUS_VERSION }}"
-          files: |
-            build/*.apk
+          name: Perseus-APK
+          path: "**/*.apk"
