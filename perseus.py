@@ -15,7 +15,7 @@ logging.basicConfig(
     datefmt='%Y-%m-%d:%H:%M:%S',
     level=logging.DEBUG)
 
-pkg = 'com.YoStarEN.AzurLane'
+pkg = 'com.YoStarJP.AzurLane'
 pkg_version = '0'
 rootdir = os.getcwd()
 
